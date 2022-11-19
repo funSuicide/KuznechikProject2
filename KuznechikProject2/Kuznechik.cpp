@@ -26,24 +26,24 @@ uint8_t Kuznechik::multiplicationGalua(uint8_t first, uint8_t second) {
 	return result;
 }
 
-void Kuznechik::transformationR(uint8_t* state) {
+void Kuznechik::transformationR(byteVector& src) {
 	uint8_t a_15 = 0;
 	byteVector internal;
 	for (int i = 15; i >= 0; i--) {
 		if (i - 1 >= 0) {
-			internal.bytes[i - 1] = state[i];
+			internal.bytes[i - 1] = src.bytes[i];
 		}
-		a_15 ^= multiplicationGalua(state[i], lVector[i]);
+		a_15 ^= multiplicationGalua(src.bytes[i], lVector[i]);
 	}
 	internal.bytes[15] = a_15;
-	std::copy(internal.bytes, internal.bytes + 16, state);
+	std::copy(internal.bytes, internal.bytes + 16, src.bytes);
 }
 
 void Kuznechik::transformaionL(uint8_t* in_data, uint8_t* out_data) {
 	byteVector internal;
 	std::copy(in_data, in_data + 16, internal.bytes);
 	for (int i = 0; i < 16; i++) {
-		transformationR(internal.bytes);
+		transformationR(internal);
 	}
 	std::copy(internal.bytes, internal.bytes + 16, out_data);
 }
@@ -68,7 +68,7 @@ void Kuznechik::printConstTable() const {
 	}
 }
 
-void Kuznechik::getRoundKeys(key& mainKey) {
+void Kuznechik::getRoundKeys(const key& mainKey) {
 	uint8_t left[16];
 	uint8_t right[16];
 	std::copy(mainKey.bytes, mainKey.bytes + 16, left);
@@ -132,7 +132,7 @@ void Kuznechik::getStartTable() {
 	}
 }
 
-void Kuznechik::encryptText(byteVector* data, byteVector* dest, int size, int iV) {
+void Kuznechik::encryptText(const byteVector* data, byteVector* dest, const int size, const int iV)  {
 	#pragma omp parallel for num_threads(4)
 	for (int i = 0; i < size; ++i) {
 		halfVector left = (uint32_t)(iV + i);

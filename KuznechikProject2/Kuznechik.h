@@ -7,7 +7,7 @@
 union halfVector{
     uint8_t bytes[8];
     long long half;
-    halfVector(long long src) {
+    halfVector(const long long src) {
         half = src;
     }
 };
@@ -15,7 +15,7 @@ union halfVector{
 union byteVector {
     halfVector halfs[2];
     uint8_t bytes[16];
-    byteVector(halfVector& left, halfVector&right) {
+    byteVector(const halfVector& left, const halfVector&right) {
         this->halfs[0] = left;
         this->halfs[1] = right;
     }
@@ -86,13 +86,13 @@ public:
 	byteVector transformationS(const byteVector& src);
     void transformaionL(uint8_t* in_data, uint8_t* out_data);
     uint8_t multiplicationGalua(uint8_t first, uint8_t second);
-    void transformationR(uint8_t* state);
+    void transformationR(byteVector& src);
     void getConstTable();
     void printConstTable() const;
-    void getRoundKeys(key& mainKey);
+    void getRoundKeys(const key& mainKey);
     void getStartTable();
     byteVector transformationF(const byteVector& left, const byteVector& right);
     byteVector xOR(const byteVector& src1, const byteVector& src2) const;
     byteVector encryptBlock(const byteVector& block);
-    void encryptText(byteVector* data, byteVector* dest, int size, int iV);
+    void encryptText(const byteVector* data, byteVector* dest, const int size, const int iV);
 };

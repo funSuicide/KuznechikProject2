@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fstream>
+#define MEGABYTE 1048576
 
 class Encryptor {
-	std::string pathOne;
-	std::string pathTwo;
-	std::string pathKey;
-	int megabyte = 1048576;
+	std::string pathToInputText;
+	std::string pathToOutputText;
 public:
-	Encryptor(std::string& pathOne, std::string& pathTwo, std::string& pathKey);
+	Kuznechik cryptoAlgorithm;
+	Encryptor(const std::string& pathOne, const std::string& pathTwo, const std::string& pathKey);
 	void encrypt() const;
 };
 
