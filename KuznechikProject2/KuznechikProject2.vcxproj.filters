@@ -32,5 +32,8 @@
     <ClInclude Include="Encryptor.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="sTable.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

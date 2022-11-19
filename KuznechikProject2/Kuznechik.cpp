@@ -1,5 +1,6 @@
 #include "Kuznechik.h"
 #include <omp.h>
+#include "sTable.h"
 
 byteVector Kuznechik::transformationS(const byteVector& src) {
 	byteVector tmp;
@@ -36,16 +37,15 @@ void Kuznechik::transformationR(byteVector& src) {
 		a_15 ^= multiplicationGalua(src.bytes[i], lVector[i]);
 	}
 	internal.bytes[15] = a_15;
-	std::copy(internal.bytes, internal.bytes + 16, src.bytes);
+	src = internal;
 }
 
-void Kuznechik::transformaionL(uint8_t* in_data, uint8_t* out_data) {
-	byteVector internal;
-	std::copy(in_data, in_data + 16, internal.bytes);
+void Kuznechik::transformaionL(byteVector& inData, byteVector& outData) {
+	byteVector internal = inData;
 	for (int i = 0; i < 16; i++) {
 		transformationR(internal);
 	}
-	std::copy(internal.bytes, internal.bytes + 16, out_data);
+	outData = internal;
 }
 
 void Kuznechik::getConstTable() {
@@ -53,7 +53,7 @@ void Kuznechik::getConstTable() {
 	numberIter.bytes[0] += 0x01;
 	for (int i = 0; i < 32; i++) {
 		byteVector result;
-		transformaionL(numberIter.bytes, result.bytes);
+		transformaionL(numberIter, result);
 		constTable[i] = result;
 		numberIter.bytes[0] += 0x01;
 	}
@@ -95,7 +95,7 @@ byteVector Kuznechik::transformationF(const byteVector& src, const byteVector& c
 	tmp = xOR(src, cons);
 	transformationS(tmp);
 	byteVector d;
-	transformaionL(tmp.bytes, d.bytes);
+	transformaionL(tmp, d);
 	return d;
 }
 
@@ -119,13 +119,13 @@ byteVector Kuznechik::encryptBlock(const byteVector& block) const {
 	return copyBLock;
 }
 
-void Kuznechik::getStartTable() {
+constexpr void Kuznechik::getStartTable() {
 	for (int j = 0; j < 16; j++) {
 		byteVector tmp;
 		for (int i = 0; i < 256; i++) {
 			byteVector c = transformationS(tmp);
 			byteVector d;
-			transformaionL(c.bytes, d.bytes);
+			transformaionL(c, d);
 			startByteT[j][i] = d;
 			tmp.bytes[j] += 0x01;
 		}

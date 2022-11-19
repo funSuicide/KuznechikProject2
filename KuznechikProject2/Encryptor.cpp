@@ -1,5 +1,4 @@
 #include "Encryptor.h"
-#include "Kuznechik.h"
 #include <fstream>
 #include <chrono>
 #include <iostream>
@@ -27,13 +26,17 @@ void Encryptor::encrypt() const {
 	byteVector* buffer = new byteVector[65536];
 	byteVector* result = new byteVector[65536];
 	for (size_t i = 0; i < countMegabytes; i++) {
-		in.read((char*)buffer[i].bytes, MEGABYTE);
+		for (size_t j = 0; j < 65536; ++j) {
+			in.read((char*)buffer[j].bytes, 16);
+		}
 		auto begin = std::chrono::steady_clock::now();
-		cryptoAlgorithm.encryptText(buffer, result, 65536, i);
+		this->cryptoAlgorithm.encryptText(buffer, result, 65536, i);
 		auto end = std::chrono::steady_clock::now();
 		auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 		std::cout << elapsed_ms << std::endl;
-		out.write((const char*)result[i].bytes, MEGABYTE);
+		for (size_t j = 0; j < 65536; ++j) {
+			out.write((const char*)result[j].bytes, 16);
+		}
 	}
 	in.close();
 	out.close();

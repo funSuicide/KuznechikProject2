@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "Kuznechik.h"
 #define MEGABYTE 1048576
 
 class Encryptor {

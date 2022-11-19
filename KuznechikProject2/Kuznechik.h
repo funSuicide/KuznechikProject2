@@ -1,3 +1,4 @@
+#pragma once
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -74,10 +75,8 @@ class Kuznechik {
     1, 148, 32, 133, 16, 194, 192, 1,
     251, 1, 192, 194, 16, 133, 32, 148
     };
-
     byteVector constTable[32]; 
     byteVector roundKeys[10];
-    byteVector startByteT[16][256];
 public:
     Kuznechik(key& mainKey) {
         getConstTable();
@@ -87,13 +86,13 @@ public:
 
     }
 	byteVector transformationS(const byteVector& src);
-    void transformaionL(uint8_t* in_data, uint8_t* out_data);
+    void transformaionL(byteVector& inData, byteVector& outData);
     uint8_t multiplicationGalua(uint8_t first, uint8_t second);
     void transformationR(byteVector& src);
     void getConstTable();
     void printConstTable() const;
     void getRoundKeys(const key& mainKey);
-    void getStartTable();
+    constexpr void getStartTable();
     byteVector transformationF(const byteVector& left, const byteVector& right);
     byteVector xOR(const byteVector& src1, const byteVector& src2) const;
     byteVector encryptBlock(const byteVector& block) const;
