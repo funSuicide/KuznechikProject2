@@ -19,10 +19,10 @@ int main() {
 	std::string path2 = "out_2.txt";
 	std::string path3 = "out2_2.txt";
 
-	//test(path1, 128*1024 * 1024);
+	test(path1, 128*1024 * 1024);
 
-	Encryptor C(path1, path2, key);
-	C.encrypt();
-	Encryptor D(path2, path3, key);
-	D.encrypt();
+	//Encryptor C(path1, path2, key);
+	//C.encrypt();
+	//Encryptor D(path2, path3, key);
+	//D.encrypt();
 }

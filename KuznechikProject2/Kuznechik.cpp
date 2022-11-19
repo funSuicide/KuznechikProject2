@@ -105,7 +105,7 @@ byteVector Kuznechik::xOR(const byteVector& src1, const byteVector& src2) const 
 	return byteVector(left, right);
 }
 
-byteVector Kuznechik::encryptBlock(const byteVector& block) {
+byteVector Kuznechik::encryptBlock(const byteVector& block) const {
 	byteVector copyBLock = block;
 	for (size_t i = 0; i < 9; i++) {
 		copyBLock = xOR(copyBLock, roundKeys[i]);
@@ -132,7 +132,7 @@ void Kuznechik::getStartTable() {
 	}
 }
 
-void Kuznechik::encryptText(const byteVector* data, byteVector* dest, const int size, const int iV)  {
+void Kuznechik::encryptText(const byteVector* data, byteVector* dest, const int size, const int iV) const{
 	#pragma omp parallel for num_threads(4)
 	for (int i = 0; i < size; ++i) {
 		halfVector left = (uint32_t)(iV + i);

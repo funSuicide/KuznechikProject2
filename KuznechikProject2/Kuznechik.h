@@ -83,6 +83,9 @@ public:
         getConstTable();
         getRoundKeys(mainKey);
     }
+    Kuznechik() {
+
+    }
 	byteVector transformationS(const byteVector& src);
     void transformaionL(uint8_t* in_data, uint8_t* out_data);
     uint8_t multiplicationGalua(uint8_t first, uint8_t second);
@@ -93,6 +96,6 @@ public:
     void getStartTable();
     byteVector transformationF(const byteVector& left, const byteVector& right);
     byteVector xOR(const byteVector& src1, const byteVector& src2) const;
-    byteVector encryptBlock(const byteVector& block);
-    void encryptText(const byteVector* data, byteVector* dest, const int size, const int iV);
+    byteVector encryptBlock(const byteVector& block) const;
+    void encryptText(const byteVector* data, byteVector* dest, const int size, const int iV) const;
 };
