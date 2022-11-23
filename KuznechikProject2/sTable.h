@@ -1,5 +1,3 @@
 #pragma once
-#include "Kuznechik.h"
 
-
-byteVector startByteT[16][256];
+extern byteVector startByteT[16][256];

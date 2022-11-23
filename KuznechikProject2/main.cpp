@@ -4,6 +4,10 @@
 #include "Encryptor.h"
 #include <string_view>
 #include <algorithm>
+#include "sTable.h"
+
+
+
 
 void test(std::string_view path1, size_t size) {
 	std::fstream output(path1.data(), std::ios::binary | std::ios::out);
@@ -19,10 +23,11 @@ int main() {
 	std::string path2 = "out_2.txt";
 	std::string path3 = "out2_2.txt";
 
+	
 	//test(path1, 128*1024 * 1024);
 
 	Encryptor C(path1, path2, key);
 	C.encrypt();
-	Encryptor D(path2, path3, key);
-	D.encrypt();
+	//Encryptor D(path2, path3, key);
+	//D.encrypt();
 }

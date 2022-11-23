@@ -11,12 +11,13 @@ union halfVector{
     halfVector(const long long src) {
         half = src;
     }
+    halfVector() = default;
 };
 
 union byteVector {
     halfVector halfs[2];
     uint8_t bytes[16];
-    byteVector(const halfVector& left, const halfVector&right) {
+    constexpr byteVector(const halfVector& left, const halfVector&right) {
         this->halfs[0] = left;
         this->halfs[1] = right;
     }
@@ -25,11 +26,7 @@ union byteVector {
             this->bytes[i] = src[i];
         }
     }
-    byteVector() {
-        for (int i = 0; i < 16; i++) {
-            bytes[i] = 0;
-        }
-    }
+    byteVector() = default;
 };
 
 struct key {
@@ -78,23 +75,19 @@ class Kuznechik {
     byteVector constTable[32]; 
     byteVector roundKeys[10];
 public:
-    Kuznechik(key& mainKey) {
-        getConstTable();
-        getRoundKeys(mainKey);
-    }
-    Kuznechik() {
-
-    }
-	byteVector transformationS(const byteVector& src);
-    void transformaionL(byteVector& inData, byteVector& outData);
-    uint8_t multiplicationGalua(uint8_t first, uint8_t second);
-    void transformationR(byteVector& src);
+    Kuznechik(const key& mainKey);
+    Kuznechik() {};
+	static constexpr byteVector transformationS(const byteVector& src);
+    static constexpr byteVector transformaionL(const byteVector& inData);
+    static constexpr uint8_t multiplicationGalua(uint8_t first, uint8_t second);
+    static constexpr byteVector transformationR(const byteVector& src);
     void getConstTable();
     void printConstTable() const;
+    void printStartTable() const;
     void getRoundKeys(const key& mainKey);
-    constexpr void getStartTable();
+    static constexpr void getStartTable();
     byteVector transformationF(const byteVector& left, const byteVector& right);
-    byteVector xOR(const byteVector& src1, const byteVector& src2) const;
+    static constexpr byteVector xOR(const byteVector& src1, const byteVector& src2);
     byteVector encryptBlock(const byteVector& block) const;
     void encryptText(const byteVector* data, byteVector* dest, const int size, const int iV) const;
 };

@@ -2,15 +2,23 @@
 #include <omp.h>
 #include "sTable.h"
 
-byteVector Kuznechik::transformationS(const byteVector& src) {
-	byteVector tmp;
+byteVector startByteT[16][256];
+
+Kuznechik::Kuznechik(const key& mainKey) {
+	getConstTable();
+	getRoundKeys(mainKey);
+	getStartTable();
+}
+
+constexpr byteVector Kuznechik::transformationS(const byteVector& src) {
+	byteVector tmp{};
 	for (size_t i = 0; i < 16; i++) {
 		tmp.bytes[i] = sTable[src.bytes[i]];
 	}
 	return tmp;
 }
 
-uint8_t Kuznechik::multiplicationGalua(uint8_t first, uint8_t second) {
+constexpr uint8_t Kuznechik::multiplicationGalua(uint8_t first, uint8_t second) {
 	uint8_t result = 0;
 	uint8_t hiBit;
 	for (int i = 0; i < 8;i++) {
@@ -27,7 +35,7 @@ uint8_t Kuznechik::multiplicationGalua(uint8_t first, uint8_t second) {
 	return result;
 }
 
-void Kuznechik::transformationR(byteVector& src) {
+constexpr byteVector Kuznechik::transformationR(const byteVector& src) {
 	uint8_t a_15 = 0;
 	byteVector internal;
 	for (int i = 15; i >= 0; i--) {
@@ -37,15 +45,15 @@ void Kuznechik::transformationR(byteVector& src) {
 		a_15 ^= multiplicationGalua(src.bytes[i], lVector[i]);
 	}
 	internal.bytes[15] = a_15;
-	src = internal;
+	return internal;
 }
 
-void Kuznechik::transformaionL(byteVector& inData, byteVector& outData) {
+constexpr byteVector Kuznechik::transformaionL(const byteVector& inData) {
 	byteVector internal = inData;
 	for (int i = 0; i < 16; i++) {
-		transformationR(internal);
+		internal = transformationR(internal);
 	}
-	outData = internal;
+	return internal;
 }
 
 void Kuznechik::getConstTable() {
@@ -53,7 +61,7 @@ void Kuznechik::getConstTable() {
 	numberIter.bytes[0] += 0x01;
 	for (int i = 0; i < 32; i++) {
 		byteVector result;
-		transformaionL(numberIter, result);
+		result  = transformaionL(numberIter);
 		constTable[i] = result;
 		numberIter.bytes[0] += 0x01;
 	}
@@ -66,6 +74,18 @@ void Kuznechik::printConstTable() const {
 		}
 		std::cout << std::endl;
 	}
+}
+
+void Kuznechik::printStartTable() const {
+	for (size_t i = 0; i < 16; ++i) {
+		for (size_t j = 0; j < 256; j++) {
+			for (size_t q = 0; q < 16; q++) {
+				printf("%02x", startByteT[i][j].bytes[q]);
+			}
+			std::cout << std::endl;
+		}
+	}
+	
 }
 
 void Kuznechik::getRoundKeys(const key& mainKey) {
@@ -95,11 +115,11 @@ byteVector Kuznechik::transformationF(const byteVector& src, const byteVector& c
 	tmp = xOR(src, cons);
 	transformationS(tmp);
 	byteVector d;
-	transformaionL(tmp, d);
+	d = transformaionL(tmp);
 	return d;
 }
 
-byteVector Kuznechik::xOR(const byteVector& src1, const byteVector& src2) const {
+constexpr byteVector Kuznechik::xOR(const byteVector& src1, const byteVector& src2)  {
 	halfVector left = src1.halfs[0].half ^ src2.halfs[0].half;
 	halfVector right = src1.halfs[1].half ^ src2.halfs[1].half;
 	return byteVector(left, right);
@@ -124,8 +144,7 @@ constexpr void Kuznechik::getStartTable() {
 		byteVector tmp;
 		for (int i = 0; i < 256; i++) {
 			byteVector c = transformationS(tmp);
-			byteVector d;
-			transformaionL(c, d);
+			byteVector d = transformaionL(c);
 			startByteT[j][i] = d;
 			tmp.bytes[j] += 0x01;
 		}
@@ -133,7 +152,7 @@ constexpr void Kuznechik::getStartTable() {
 }
 
 void Kuznechik::encryptText(const byteVector* data, byteVector* dest, const int size, const int iV) const{
-	#pragma omp parallel for num_threads(4)
+	//#pragma omp parallel for num_threads(8)
 	for (int i = 0; i < size; ++i) {
 		halfVector left = (uint32_t)(iV + i);
 		halfVector right = (uint32_t)(iV + i);
